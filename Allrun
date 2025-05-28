@@ -16,5 +16,5 @@ fluentMeshToFoam vent1.msh
 # checkMesh
 
 # 4. Run mesh motion
-echo "Running moveMesh..."
-moveMesh
+echo "Running moveDynamicMesh..."
+moveDynamicMesh
