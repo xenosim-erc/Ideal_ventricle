@@ -1,20 +1,25 @@
 #!/bin/bash
-# Allrun script for OpenFOAM case
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
+#------------------------------------------------------------------------------
 
-set -e  # Exit immediately on error
+# Define mesh file name
+mshFile="vent1.msh"
 
-# 1. Download mesh file from Drive
-echo "Downloading vent1.msh..."
-curl -L -o vent1.msh "https://drive.google.com/drive/folders/1ihwW1Ud6tT3tkRLEchBMPcm67ae7_qqM?usp=sharing"
-# Example for large files: https://github.com/wkentaro/gdown for Google Drive
+# 1. Ensure the mesh file exists
+if [ ! -f "$mshFile" ]; then
+    echo "ERROR: Mesh file '$mshFile' not found!"
+    echo "Make sure Git LFS is installed and run: git lfs pull"
+    echo "e.g. on macOS, run 'brew install git-lfs && git lfs install'"
+    exit 1
+fi
 
 # 2. Convert Fluent mesh to OpenFOAM format
-echo "Converting vent1.msh to OpenFOAM format..."
-fluentMeshToFoam vent1.msh
+runApplication fluentMeshToFoam "$mshFile"
 
-# 3. (Optional) Check mesh
-# checkMesh
+# 3. Check mesh
+runApplication checkMesh
 
 # 4. Run mesh motion
-echo "Running moveDynamicMesh..."
-moveDynamicMesh
+runApplication moveDynamicMesh
+
