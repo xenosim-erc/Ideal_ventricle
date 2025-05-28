@@ -1,0 +1,70 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2412                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       pointVectorField;
+    object      pointDisplacement;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 1 0 0 0 0 0];
+
+internalField   uniform (0 0 0);
+
+boundaryField
+{
+VENTRICLE
+{
+    type codedFixedValue;
+    value uniform (0 0 0);
+
+    name radialOscillation;
+
+    code
+    #{
+        const pointField& points = patch().localPoints();
+        vector center(0, 0, 0);
+        scalar A = 0.001;
+        scalar freq = 1.0;
+        scalar T = 1.0 / freq;
+        scalar t_mod = fmod(this->db().time().value(), T);  // time modulo period
+
+        scalar scale = A * sin(M_PI * t_mod / T);
+
+        vectorField disp(points.size());
+        forAll(points, i)
+        {
+            vector r = points[i] - center;
+            scalar magR = mag(r) + VSMALL;
+            disp[i] = scale * r / magR;
+        }
+
+        operator==(disp);
+    #};
+}
+
+INLET
+{
+    type            fixedValue;
+    value           uniform (0 0 0);
+}
+OUTLET
+{
+     type            fixedValue;
+     value           uniform (0 0 0);
+        
+}
+WALL
+{
+    type            fixedValue;
+    value           uniform (0 0 0);
+}
+}
+// ************************************************************************* //
