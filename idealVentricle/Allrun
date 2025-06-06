@@ -21,5 +21,8 @@ runApplication fluentMeshToFoam "$mshFile"
 runApplication checkMesh
 
 # 4. Run mesh motion
+# Note: we may need to update the library path on macOS to ensure the
+# FOAM_USER_LIBBIN is included
+export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:$FOAM_LIBBIN:$FOAM_USER_LIBBIN"
 runApplication moveDynamicMesh
 
