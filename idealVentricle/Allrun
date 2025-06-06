@@ -1,0 +1,28 @@
+#!/bin/bash
+cd "${0%/*}" || exit                                # Run from this directory
+. ${WM_PROJECT_DIR:?}/bin/tools/RunFunctions        # Tutorial run functions
+#------------------------------------------------------------------------------
+
+# Define mesh file name
+mshFile="vent1.msh"
+
+# 1. Ensure the mesh file exists
+if [ ! -f "$mshFile" ]; then
+    echo "ERROR: Mesh file '$mshFile' not found!"
+    echo "Make sure Git LFS is installed and run: git lfs pull"
+    echo "e.g. on macOS, run 'brew install git-lfs && git lfs install'"
+    exit 1
+fi
+
+# 2. Convert Fluent mesh to OpenFOAM format
+runApplication fluentMeshToFoam "$mshFile"
+
+# 3. Check mesh
+runApplication checkMesh
+
+# 4. Run mesh motion
+# Note: we may need to update the library path on macOS to ensure the
+# FOAM_USER_LIBBIN is included
+export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:$FOAM_LIBBIN:$FOAM_USER_LIBBIN"
+runApplication moveDynamicMesh
+

@@ -18,11 +18,17 @@ dynamicFvMesh dynamicMotionSolverFvMesh;
 
 motionSolverLibs ("libfvMotionSolvers.so");
 
-motionSolver displacementLaplacian;
+//motionSolver displacementLaplacian;
+motionSolver meshMotionFromDisk;
 
 displacementLaplacianCoeffs
 {
     diffusivity uniform;
+}
+
+meshMotionFromDiskCoeffs
+{
+    dispFilesDirectory "pointDisplacementFiles";
 }
 
 

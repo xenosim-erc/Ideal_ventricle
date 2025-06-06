@@ -14,8 +14,12 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-libs ("libfvMotionSolvers.so"
-    "libmeshTools.so");
+libs
+(
+    "libfvMotionSolvers.so"
+    "libmeshTools.so"
+    "libmeshMotionFromDiskFvMotionSolver.so"
+);
 
 application     pimpleFoam;
 
