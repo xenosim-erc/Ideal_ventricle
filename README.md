@@ -2,7 +2,8 @@
 
 ## Overview
 
-This case is described in XXX (Chanikya - add the reference)
+This case is described in journal paper titled "Modeling heart flow dynamics using numerical simulations to identify the 
+vortex ring: A practical guide" (Lazpitaa et al)
 
 ## Compilation
 
