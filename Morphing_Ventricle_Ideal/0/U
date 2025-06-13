@@ -1,0 +1,135 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    arch        "LSB;label=32;scalar=64";
+    class       volVectorField;
+    location    "0";
+    object      U;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [ 0 1 -1 0 0 0 0 ];
+
+internalField   uniform ( 0 0 0 );
+
+boundaryField
+{
+    WALL
+    {
+        type            movingWallVelocity;
+        value           uniform ( 0 0 0 );
+    }
+    TUBES
+    {
+        type            fixedValue;
+        value           uniform ( 0 0 0 );
+    }
+    INLET
+    {
+   /* type codedFixedValue;
+    value uniform (0 0 0);  // fallback value
+
+    name inletFourierBC;
+
+    code
+    #{
+        const scalar t = this->db().time().value();
+
+        // Fourier coefficients
+        const scalar a0 = 0.1764;
+        const scalar a1 = 0.0761;
+        const scalar b1 = 0.1806;
+        const scalar a2 = -0.0487;
+        const scalar b2 = 0.2538;
+        const scalar a3 = -0.1477;
+        const scalar b3 = -0.0408;
+        const scalar a4 = -0.0828;
+        const scalar b4 = -0.0108;
+        const scalar a5 = 0.0476;
+        const scalar b5 = -0.0591;
+        const scalar a6 = -0.0351;
+        const scalar b6 = 0.001;
+        const scalar a7 = 0.0209;
+        const scalar b7 = 0.0076;
+        const scalar a8 = -0.012;
+        const scalar b8 = -0.0233;
+        const scalar w  = 6.4207;
+
+        // Evaluate Fourier series
+        scalar velocity = a0
+            + a1*cos(1*w*t) + b1*sin(1*w*t)
+            + a2*cos(2*w*t) + b2*sin(2*w*t)
+            + a3*cos(3*w*t) + b3*sin(3*w*t)
+            + a4*cos(4*w*t) + b4*sin(4*w*t)
+            + a5*cos(5*w*t) + b5*sin(5*w*t)
+            + a6*cos(6*w*t) + b6*sin(6*w*t)
+            + a7*cos(7*w*t) + b7*sin(7*w*t)
+            + a8*cos(8*w*t) + b8*sin(8*w*t);
+
+        vector v = vector(0, 0, velocity);  // X-direction flow
+        operator==(v);
+    #};*/
+    type codedFixedValue;
+    value uniform (0 0 0);
+    name inletSwitchingVelocity;
+
+    code
+    #{
+
+         scalar t = this->db().time().value();
+
+    if (
+    (t >= 0)
+    )
+    {
+    operator==(this->patchInternalField()); //operator==(0); // fixedValue 0
+    }
+else if (
+    (t >= 0.65)
+    )
+    {
+    operator==(vector(0, 0, 0)); // zeroGradient behavior
+    }
+    #};
+
+    }
+    OUTLET
+    {
+       // type            fixedValue;
+        // value           uniform ( 0 0 0 );
+        //type            zeroGradient;
+    type codedFixedValue;
+    value uniform (0 0 0);
+    name outletSwitchingVelocity;
+
+    code
+    #{
+
+     scalar t = this->db().time().value();
+
+    if (
+    (t >= 0)
+    )
+    {
+    operator==(vector(0, 0, 0)); //operator==(0); // fixedValue 0
+    }
+else if (
+    (t >= 0.65)
+    )
+    {
+    operator==(this->patchInternalField()); // zeroGradient behavior
+    }
+    #};
+    }
+}
+
+
+// ************************************************************************* //

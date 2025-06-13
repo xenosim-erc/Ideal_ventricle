@@ -1,0 +1,86 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2412                                  |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      binary;
+    arch        "LSB;label=32;scalar=64";
+    class       volScalarField;
+    location    "0";
+    object      p;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [ 0 2 -2 0 0 0 0 ];
+
+internalField   uniform 0;
+
+boundaryField
+{
+    WALL
+    {
+        type            zeroGradient;
+    }
+    TUBES
+    {
+        type            zeroGradient;
+    }
+    INLET
+    {
+       
+    type codedFixedValue;
+    value uniform 0;
+    name inletSwitchingPressure;
+
+    code
+    #{
+     scalar t = this->db().time().value();
+
+    if (
+    (t >= 0)
+    )
+    {
+    operator==(0); // fixedValue 0
+    }
+else if (
+    (t >= 0.65)
+    )
+    {
+    operator==(this->patchInternalField()); // zeroGradient behavior
+    }
+    #};
+    }
+    OUTLET
+    {
+         //type            zeroGradient;
+    type codedFixedValue;
+    value uniform 0;
+    name outletSwitchingPressure;
+
+    code
+    #{
+        scalar t = this->db().time().value();
+
+    if (
+    (t >= 0)
+    )
+    {
+    operator==(this->patchInternalField()); //operator==(0); // fixedValue 0
+    }
+else if (
+    (t >= 0.65)
+    )
+    {
+    operator==(0); // zeroGradient behavior
+    }
+    #};
+    }
+}
+
+
+// ************************************************************************* //
